@@ -4,11 +4,27 @@
 USERNAME="kogulan"               # Change to your preferred username
 PASSWORD="StrongPass123"         # Change to a strong password
 
-# === Cleanup Previously Installed Desktops and XRDP ===
-echo "[*] Cleaning up previously installed desktop environments and XRDP..."
-sudo apt purge -y ubuntu-mate-core ubuntu-mate-desktop ubuntu-desktop xfce4 lxde lxqt cinnamon-desktop-environment kde-plasma-desktop xrdp libreoffice code
+# === Cleanup Previously Installed Packages ===
+echo "[*] Cleaning up previously installed desktop environments and software..."
+sudo apt purge -y \
+  ubuntu-mate-core ubuntu-mate-desktop ubuntu-desktop \
+  xfce4 xfce4-goodies lxde lxqt cinnamon-desktop-environment \
+  kde-plasma-desktop xrdp firefox chromium-browser libreoffice code
 sudo apt autoremove -y
 sudo apt autoclean
+
+# === List Software to be Installed ===
+echo ""
+echo "=============================================="
+echo "The following software will be installed:"
+echo " - XFCE desktop environment"
+echo " - XRDP remote desktop server"
+echo " - Firefox browser"
+echo " - Chromium browser"
+echo " - LibreOffice suite"
+echo " - Visual Studio Code"
+echo "=============================================="
+echo ""
 
 # === System Update ===
 echo "[*] Updating system..."
@@ -36,14 +52,9 @@ sudo adduser --gecos "" --disabled-password "$USERNAME"
 echo "$USERNAME:$PASSWORD" | sudo chpasswd
 sudo usermod -aG sudo "$USERNAME"
 
-# === Install Firefox ===
-echo "[*] Installing Firefox..."
-sudo apt update
-sudo apt install -y firefox
-
-# === Install Chromium Browser ===
-echo "[*] Installing Chromium Browser..."
-sudo apt install -y chromium-browser
+# === Install Browsers ===
+echo "[*] Installing Firefox and Chromium browsers..."
+sudo apt install -y firefox chromium-browser
 
 # === Install LibreOffice ===
 echo "[*] Installing LibreOffice office suite..."
