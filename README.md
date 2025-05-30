@@ -1,106 +1,151 @@
+# 🖥️ Ubuntu Remote Desktop Setup Script (XFCE + XRDP + VS Code + LibreOffice)
 
-# Ubuntu 22.04 RDP Setup with XFCE, Browsers, LibreOffice, and VS Code
+This Bash script automates the setup of a **lightweight Ubuntu desktop environment** with **XRDP remote access**, browsers, productivity tools, and firewall rules on **Ubuntu 22.04**.
 
-This repository contains a setup script to configure an Ubuntu 22.04 LTS virtual machine on Oracle Cloud Infrastructure (OCI) for Remote Desktop Protocol (RDP) access with XFCE desktop environment, browsers, office suite, and VS Code.
+## 🚀 Features
 
----
-
-## Features Installed by the Script
-
-- **XFCE** Desktop Environment  
-- **xrdp** Remote Desktop Server  
-- **Firefox** Web Browser  
-- **Chromium** Web Browser  
-- **LibreOffice** Office Suite  
-- **Visual Studio Code** Code Editor  
-
----
-
-## Prerequisites
-
-- Ubuntu 22.04 LTS VM running on Oracle Cloud Infrastructure  
-- Basic knowledge of Linux command line  
-- SSH access to the VM with sudo privileges  
+- Installs the XFCE desktop environment (lightweight and fast)
+- Sets up XRDP for Remote Desktop access
+- Installs:
+  - Firefox and Chromium web browsers
+  - LibreOffice suite
+  - Visual Studio Code
+- Creates a new sudo user for RDP access
+- Configures firewall (UFW) for SSH and RDP
+- Cleans up unnecessary desktop packages
 
 ---
 
-## Usage Instructions
+## 📋 Prerequisites
 
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/yourusername/your-repo.git
-   cd your-repo
-   ```
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/yourusername/your-repo.git
-   cd your-repo
-   ```
-
-2. **Make the setup script executable**
-
-   ```bash
-   chmod +x setup-xrdp-xfce.sh
-   ```
-
-3. **Run the setup script**
-
-   ```bash
-   ./setup-xrdp-xfce.sh
-   ```
-
-   > The script will:  
-   > - Clean any previous conflicting installations  
-   > - Update the system  
-   > - Install XFCE desktop, xrdp, browsers, LibreOffice, and VS Code  
-   > - Configure xrdp to use XFCE  
-   > - Create a new user for RDP login (default username/password in script)  
-   > - Configure firewall to allow RDP and SSH  
-   > - Output the IP address and login details for RDP connection  
-
-4. **Connect using an RDP client**
-
-   - On Windows, use **Remote Desktop Connection** (`mstsc`).  
-   - On macOS, use **Microsoft Remote Desktop** from the App Store.  
-   - Connect to: `YOUR_VM_PUBLIC_IP:3389`  
-   - Login with the username and password shown by the script output.  
+- Ubuntu 22.04 (fresh installation recommended)
+- Internet connection
+- Run as a user with `sudo` privileges
 
 ---
 
-## Important Notes
+## 🛠️ How to Use
 
-- Change the default password after first login for security.  
-- Make sure your OCI security list allows inbound traffic on port `3389` for RDP.  
-- The script assumes you have `sudo` privileges.  
-- If you want to customize the username/password, edit the `setup-xrdp-xfce.sh` script before running.  
+### 1. Clone or Download
 
----
+```bash
+git clone https://github.com/your-repo/ubuntu-xrdp-setup.git
+cd ubuntu-xrdp-setup
+```
 
-## Troubleshooting
+Or simply download and run the script:
 
-- If RDP connection fails, verify that port 3389 is open in OCI and on the VM's firewall.  
-- Ensure the xrdp service is running:
+```bash
+wget https://yourdomain.com/setup-xrdp.sh
+chmod +x setup-xrdp.sh
+```
 
-  ```bash
-  sudo systemctl status xrdp
-  ```
+### 2. Edit Configuration (Optional)
 
-- To restart xrdp:
+At the top of the script, you can set a custom username and password for the new RDP user:
 
-  ```bash
-  sudo systemctl restart xrdp
-  ```
+```bash
+USERNAME="kogulan"               # Change to your preferred username
+PASSWORD="StrongPass123"         # Change to a strong password
+```
 
----
-
-## License
-
-This project is licensed under the MIT License.
+> 💡 **Security Tip:** Avoid hardcoding passwords. You can remove `PASSWORD` and let `adduser` prompt for it interactively.
 
 ---
 
-## Author
+### 3. Run the Script
 
-Your Name - [your.email@example.com](mailto:your.email@example.com)
+```bash
+sudo ./setup-xrdp.sh
+```
+
+The script will:
+- Clean existing desktop environments
+- Install XFCE, XRDP, browsers, office suite, and VS Code
+- Create a new RDP user
+- Set up the firewall
+- Display the public IP and login credentials
+
+---
+
+## 🖥️ Remote Desktop Login
+
+Use any RDP client (like **Remote Desktop Connection** on Windows or **Remmina** on Linux/macOS):
+
+- **Host/IP:** (shown at the end of the script)  
+- **Port:** `3389`
+- **Username:** `kogulan` (or your custom value)
+- **Password:** `StrongPass123` (or your custom value)
+
+Example:
+
+```text
+Username: kogulan
+Password: StrongPass123
+RDP Address: 203.0.113.15:3389
+```
+
+---
+
+## 🔒 Security Warning
+
+**Do not use weak passwords** for remote access. It’s strongly recommended to:
+
+- Use SSH key-based login instead of passwords (for SSH)
+- Change the password after logging in
+- Use fail2ban or other brute-force protection if exposed to the internet
+
+---
+
+## 🧹 Uninstallation (Optional)
+
+To remove all installed components:
+
+```bash
+sudo apt purge -y xfce4 xfce4-goodies xrdp firefox chromium libreoffice code
+sudo apt autoremove -y
+```
+
+---
+
+## 📄 Example Output
+
+```
+[*] Cleaning up previously installed desktop environments...
+[*] Updating system...
+[*] Installing XFCE Desktop Environment...
+[*] Installing XRDP...
+[*] Creating user 'kogulan'...
+[*] Installing Firefox and Chromium browsers...
+[*] Installing LibreOffice office suite...
+[*] Installing Visual Studio Code...
+[*] Setting up UFW firewall rules...
+
+✅ XRDP with XFCE, LibreOffice, and VS Code is ready on Ubuntu 22.04!
+🌐 Browsers: Firefox, Chromium
+📝 Office: LibreOffice
+💻 Editor: Visual Studio Code
+🔐 RDP Login: kogulan / StrongPass123
+🌍 Connect: 203.0.113.15:3389
+```
+
+---
+
+## 📦 Tested On
+
+- ✅ Ubuntu 22.04 LTS (64-bit)
+
+---
+
+## 📬 Issues & Contributions
+
+Feel free to open an issue or submit a pull request to improve the script or add support for additional configurations!
+
+---
+
+## 🧑‍💻 Author
+
+**Kogulan**  
+Feel free to customize and use in your own deployment workflows.
+
+---
