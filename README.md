@@ -1,127 +1,100 @@
 
-# Ubuntu XRDP with XFCE, Firefox, and Chrome/Chromium Setup
+# Ubuntu 22.04 RDP Setup with XFCE, Browsers, LibreOffice, and VS Code
 
-This repository provides an automated script to install and configure **XRDP** with the **XFCE desktop environment** on **Ubuntu 22.04 LTS**. It also installs the latest versions of **Firefox** and **Google Chrome** (or Chromium as fallback). Ideal for cloud VMs like those on **Oracle Cloud Infrastructure (OCI)**, **AWS**, or **Azure**.
-
----
-
-## 🧰 Features
-
-- Removes old desktop environments
-- Installs **XFCE4** desktop environment
-- Installs and configures **XRDP**
-- Creates a new user with RDP access
-- Installs **Firefox** (APT version, no Snap)
-- Installs **Google Chrome** (falls back to **Chromium** if Chrome fails)
-- Opens required ports (RDP & SSH)
-- Enables **UFW** firewall
+This repository contains a setup script to configure an Ubuntu 22.04 LTS virtual machine on Oracle Cloud Infrastructure (OCI) for Remote Desktop Protocol (RDP) access with XFCE desktop environment, browsers, office suite, and VS Code.
 
 ---
 
-## 🚀 Prerequisites
+## Features Installed by the Script
 
-- Ubuntu 22.04 LTS virtual machine
-- Outbound internet access from the VM
-- Inbound port **3389** open (in OCI Security List or NSG)
-- SSH access to the VM
-
----
-
-## 🔧 Installation Steps
-
-### 1. SSH into your Ubuntu 22.04 VM
-
-```bash
-ssh -i /path/to/private_key.pem ubuntu@<your_vm_ip>
-```
-
-### 2. Clone this repository
-
-```bash
-git clone https://github.com/kogulan/ubuntu-xrdp-setup.git
-cd ubuntu-xrdp-setup
-```
-
-### 3. Make the script executable
-
-```bash
-chmod +x setup-xrdp-xfce.sh
-```
-
-### 4. Run the script
-
-```bash
-./setup-xrdp-xfce.sh
-```
-
-The script will:
-
-- Install XFCE desktop environment
-- Install and configure XRDP
-- Create a user (default: `kogulan`, password: `StrongPass123`)
-- Install Firefox and Google Chrome (or Chromium as fallback)
-- Configure the firewall for SSH and RDP access
+- **XFCE** Desktop Environment  
+- **xrdp** Remote Desktop Server  
+- **Firefox** Web Browser  
+- **Chromium** Web Browser  
+- **LibreOffice** Office Suite  
+- **Visual Studio Code** Code Editor  
 
 ---
 
-## 💻 How to Connect via RDP
+## Prerequisites
 
-Use an RDP client from **Windows**, **macOS**, or **Linux**:
-
-- **RDP Host**: `your_vm_ip:3389`
-- **Username**: `kogulan`
-- **Password**: `StrongPass123`
-
-> 🔐 It is strongly recommended to change the password after logging in:
-> ```bash
-> sudo passwd kogulan
-> ```
+- Ubuntu 22.04 LTS VM running on Oracle Cloud Infrastructure  
+- Basic knowledge of Linux command line  
+- SSH access to the VM with sudo privileges  
 
 ---
 
-## 🔒 Security Hardening Tips
+## Usage Instructions
 
-- **Restrict RDP to your IP** (optional):
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/yourusername/your-repo.git
+   cd your-repo
+   ```
+
+2. **Make the setup script executable**
+
+   ```bash
+   chmod +x setup-rdp.sh
+   ```
+
+3. **Run the setup script**
+
+   ```bash
+   ./setup-rdp.sh
+   ```
+
+   > The script will:  
+   > - Clean any previous conflicting installations  
+   > - Update the system  
+   > - Install XFCE desktop, xrdp, browsers, LibreOffice, and VS Code  
+   > - Configure xrdp to use XFCE  
+   > - Create a new user for RDP login (default username/password in script)  
+   > - Configure firewall to allow RDP and SSH  
+   > - Output the IP address and login details for RDP connection  
+
+4. **Connect using an RDP client**
+
+   - On Windows, use **Remote Desktop Connection** (`mstsc`).  
+   - On macOS, use **Microsoft Remote Desktop** from the App Store.  
+   - Connect to: `YOUR_VM_PUBLIC_IP:3389`  
+   - Login with the username and password shown by the script output.  
+
+---
+
+## Important Notes
+
+- Change the default password after first login for security.  
+- Make sure your OCI security list allows inbound traffic on port `3389` for RDP.  
+- The script assumes you have `sudo` privileges.  
+- If you want to customize the username/password, edit the `setup-rdp.sh` script before running.  
+
+---
+
+## Troubleshooting
+
+- If RDP connection fails, verify that port 3389 is open in OCI and on the VM's firewall.  
+- Ensure the xrdp service is running:
+
   ```bash
-  sudo ufw deny 3389
-  sudo ufw allow from <your.ip.address.here> to any port 3389 proto tcp
+  sudo systemctl status xrdp
   ```
 
-- **Install fail2ban** (to protect SSH and XRDP from brute-force attacks):
+- To restart xrdp:
+
   ```bash
-  sudo apt install -y fail2ban
+  sudo systemctl restart xrdp
   ```
 
-- **Disable the default user or rename it** if not needed.
+---
+
+## License
+
+This project is licensed under the MIT License.
 
 ---
 
-## 🧹 To Uninstall Everything
+## Author
 
-```bash
-sudo apt purge -y xrdp xfce4 xfce4-goodies firefox chromium-browser google-chrome-stable
-sudo apt autoremove -y
-sudo apt autoclean
-```
-
----
-
-## 📂 Repository Structure
-
-```
-ubuntu-xrdp-setup/
-├── setup-xrdp-xfce.sh
-└── README.md
-```
-
----
-
-## 📝 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-## 🙋 Support
-
-If you encounter issues, please [open an issue](https://github.com/<your-github-username>/ubuntu-xrdp-setup/issues).
+Your Name - [your.email@example.com](mailto:your.email@example.com)
