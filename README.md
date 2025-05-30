@@ -38,10 +38,10 @@ cd ubuntu-xrdp-setup
 Or simply download and run the script:
 
 ```bash
-wget https://yourdomain.com/setup-xrdp.sh
+wget https://yourdomain.com/setup-xrdp-xfce.sh
 ```
 ```bash
-chmod +x setup-xrdp.sh
+chmod +x setup-xrdp-xfce.sh
 ```
 
 ### 2. Edit Configuration (Optional)
@@ -60,7 +60,7 @@ PASSWORD="StrongPass123"         # Change to a strong password
 ### 3. Run the Script
 
 ```bash
-sudo ./setup-xrdp.sh
+sudo ./setup-xrdp-xfce.sh
 ```
 
 The script will:
