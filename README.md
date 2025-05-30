@@ -29,7 +29,9 @@ This Bash script automates the setup of a **lightweight Ubuntu desktop environme
 ### 1. Clone or Download
 
 ```bash
-git clone https://github.com/your-repo/ubuntu-xrdp-setup.git
+git clone https://github.com/kogulan/ubuntu-xrdp-setup.git
+```
+```bash
 cd ubuntu-xrdp-setup
 ```
 
@@ -37,6 +39,8 @@ Or simply download and run the script:
 
 ```bash
 wget https://yourdomain.com/setup-xrdp.sh
+```
+```bash
 chmod +x setup-xrdp.sh
 ```
 
