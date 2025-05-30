@@ -6,7 +6,7 @@ PASSWORD="StrongPass123"         # Change to a strong password
 
 # === Cleanup Previously Installed Desktops and XRDP ===
 echo "[*] Cleaning up previously installed desktop environments and XRDP..."
-sudo apt purge -y ubuntu-mate-core ubuntu-mate-desktop ubuntu-desktop xfce4 lxde lxqt cinnamon-desktop-environment kde-plasma-desktop xrdp
+sudo apt purge -y ubuntu-mate-core ubuntu-mate-desktop ubuntu-desktop xfce4 lxde lxqt cinnamon-desktop-environment kde-plasma-desktop xrdp libreoffice code
 sudo apt autoremove -y
 sudo apt autoclean
 
@@ -36,10 +36,27 @@ sudo adduser --gecos "" --disabled-password "$USERNAME"
 echo "$USERNAME:$PASSWORD" | sudo chpasswd
 sudo usermod -aG sudo "$USERNAME"
 
-# === Install Web Browsers ===
-echo "[*] Installing Firefox and Chromium browsers..."
+# === Install Firefox ===
+echo "[*] Installing Firefox..."
 sudo apt update
-sudo apt install -y firefox chromium-browser
+sudo apt install -y firefox
+
+# === Install Chromium Browser ===
+echo "[*] Installing Chromium Browser..."
+sudo apt install -y chromium-browser
+
+# === Install LibreOffice ===
+echo "[*] Installing LibreOffice office suite..."
+sudo apt install -y libreoffice
+
+# === Install Visual Studio Code ===
+echo "[*] Installing Visual Studio Code..."
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+sudo install -o root -g root -m 644 packages.microsoft.gpg /usr/share/keyrings/
+sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+sudo apt update
+sudo apt install -y code
+rm -f packages.microsoft.gpg
 
 # === Configure Firewall ===
 echo "[*] Setting up UFW firewall rules..."
@@ -51,10 +68,14 @@ sudo ufw --force enable
 IP=$(curl -s ifconfig.me)
 echo ""
 echo "====================================================="
-echo "✅ XRDP with XFCE is ready on Ubuntu 22.04!"
+echo "✅ XRDP with XFCE, LibreOffice, and VS Code is ready on Ubuntu 22.04!"
 echo "🌐 Web browsers installed:"
-echo "   - Firefox (Default Browser)"
+echo "   - Firefox"
 echo "   - Chromium"
+echo "📝 Office suite installed:"
+echo "   - LibreOffice"
+echo "💻 Editor installed:"
+echo "   - Visual Studio Code"
 echo "🔐 Login with:"
 echo "   - Username: $USERNAME"
 echo "   - Password: $PASSWORD"
