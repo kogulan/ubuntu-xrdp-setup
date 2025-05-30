@@ -38,7 +38,7 @@ ssh -i /path/to/private_key.pem ubuntu@<your_vm_ip>
 ### 2. Clone this repository
 
 ```bash
-git clone https://github.com/<your-github-username>/ubuntu-xrdp-setup.git
+git clone https://github.com/kogulan/ubuntu-xrdp-setup.git
 cd ubuntu-xrdp-setup
 ```
 
