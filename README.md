@@ -32,17 +32,22 @@ This repository contains a setup script to configure an Ubuntu 22.04 LTS virtual
    git clone https://github.com/yourusername/your-repo.git
    cd your-repo
    ```
+Example:
+   ```bash
+   git clone https://github.com/kogulan/ubuntu-xrdp-setup.git
+   cd ubuntu-xrdp-setup
+   ```
 
 2. **Make the setup script executable**
 
    ```bash
-   chmod +x setup-rdp.sh
+   chmod +x setup-xrdp-xfce.sh
    ```
 
 3. **Run the setup script**
 
    ```bash
-   ./setup-rdp.sh
+   ./setup-xrdp-xfce.sh
    ```
 
    > The script will:  
@@ -68,7 +73,7 @@ This repository contains a setup script to configure an Ubuntu 22.04 LTS virtual
 - Change the default password after first login for security.  
 - Make sure your OCI security list allows inbound traffic on port `3389` for RDP.  
 - The script assumes you have `sudo` privileges.  
-- If you want to customize the username/password, edit the `setup-rdp.sh` script before running.  
+- If you want to customize the username/password, edit the `setup-xrdp-xfce.sh` script before running.  
 
 ---
 
