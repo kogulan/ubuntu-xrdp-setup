@@ -36,21 +36,10 @@ sudo adduser --gecos "" --disabled-password "$USERNAME"
 echo "$USERNAME:$PASSWORD" | sudo chpasswd
 sudo usermod -aG sudo "$USERNAME"
 
-# === Install Firefox ===
+# === Install Web Browsers ===
+echo "[*] Installing Firefox and Chromium browsers..."
 sudo apt update
-sudo apt install -y firefox
-
-# === Attempt to Install Google Chrome ===
-echo "[*] Attempting to install Google Chrome..."
-wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-if sudo apt install -y ./google-chrome-stable_current_amd64.deb; then
-    echo "✅ Google Chrome installed successfully."
-    rm google-chrome-stable_current_amd64.deb
-else
-    echo "⚠️ Google Chrome installation failed. Installing Chromium instead..."
-    sudo apt install -y chromium-browser
-    rm -f google-chrome-stable_current_amd64.deb
-fi
+sudo apt install -y firefox chromium-browser
 
 # === Configure Firewall ===
 echo "[*] Setting up UFW firewall rules..."
@@ -64,8 +53,8 @@ echo ""
 echo "====================================================="
 echo "✅ XRDP with XFCE is ready on Ubuntu 22.04!"
 echo "🌐 Web browsers installed:"
-echo "   - Firefox (APT version)"
-echo "   - Google Chrome (or Chromium if Chrome failed)"
+echo "   - Firefox (Default Browser)"
+echo "   - Chromium"
 echo "🔐 Login with:"
 echo "   - Username: $USERNAME"
 echo "   - Password: $PASSWORD"
