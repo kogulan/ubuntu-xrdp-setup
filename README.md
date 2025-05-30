@@ -32,11 +32,11 @@ This repository contains a setup script to configure an Ubuntu 22.04 LTS virtual
    git clone https://github.com/yourusername/your-repo.git
    cd your-repo
    ```
-1.1 **Example:**
-   ````bash
+1.1. **Example:**
+   ```bash
    git clone https://github.com/kogulan/ubuntu-xrdp-setup.git
    cd ubuntu-xrdp-setup
-   ````
+   ```
 
 2. **Make the setup script executable**
 
