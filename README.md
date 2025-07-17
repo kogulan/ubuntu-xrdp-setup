@@ -44,31 +44,20 @@ wget https://yourdomain.com/setup-xrdp-xfce.sh
 chmod +x setup-xrdp-xfce.sh
 ```
 
-### 2. Edit Configuration (Optional)
+### 2. Run the Script
 
-At the top of the script, you can set a custom username and password for the new RDP user:
-
-```bash
-USERNAME="kogulan"               # Change to your preferred username
-PASSWORD="StrongPass123"         # Change to a strong password
-```
-
-> 💡 **Security Tip:** Avoid hardcoding passwords. You can remove `PASSWORD` and let `adduser` prompt for it interactively.
-
----
-
-### 3. Run the Script
+Run the script with `sudo` privileges:
 
 ```bash
 sudo ./setup-xrdp-xfce.sh
 ```
 
-The script will:
-- Clean existing desktop environments
-- Install XFCE, XRDP, browsers, office suite, and VS Code
-- Create a new RDP user
-- Set up the firewall
-- Display the public IP and login credentials
+The script will prompt you to:
+- Enter a **username** for the new RDP user (or press Enter to use the default `kogulan`).
+- Confirm that you want to proceed with the installation.
+- Set a **password** for the new user.
+
+The script will then automate the entire setup process, including cleaning old packages, installing the desktop and applications, and configuring the firewall.
 
 ---
 

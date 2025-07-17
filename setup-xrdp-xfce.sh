@@ -1,95 +1,154 @@
 #!/bin/bash
 
 # === Configuration ===
-USERNAME="kogulan"               # Change to your preferred username
-PASSWORD="StrongPass123"         # Change to a strong password
+# Prompt for the username, defaulting to "kogulan"
+read -p "Enter the username for the new RDP user [kogulan]: " USERNAME
+USERNAME=${USERNAME:-kogulan}
 
-# === Cleanup Previously Installed Packages ===
-echo "[*] Cleaning up previously installed desktop environments and software..."
-sudo apt purge -y \
-  ubuntu-mate-core ubuntu-mate-desktop ubuntu-desktop \
-  xfce4 xfce4-goodies lxde lxqt cinnamon-desktop-environment \
-  kde-plasma-desktop xrdp firefox chromium-browser libreoffice code
-sudo apt autoremove -y
-sudo apt autoclean
+# --- Helper Functions ---
+# Function to display error and exit
+error_exit() {
+  echo "❌ Error: $1" >&2
+  exit 1
+}
 
-# === List Software to be Installed ===
-echo ""
-echo "=============================================="
-echo "The following software will be installed:"
-echo " - XFCE desktop environment"
-echo " - XRDP remote desktop server"
-echo " - Firefox browser"
-echo " - Chromium browser"
-echo " - LibreOffice suite"
-echo " - Visual Studio Code"
-echo "=============================================="
-echo ""
+# Function to print a separator line
+print_separator() {
+  echo "=============================================="
+}
 
-# === System Update ===
-echo "[*] Updating system..."
-sudo apt update && sudo apt upgrade -y
+# --- Main Logic ---
+# Function to display a welcome message and summary
+show_welcome_message() {
+  echo "👋 Welcome to the Ubuntu Remote Desktop Setup Script!"
+  print_separator
+  echo "This script will install and configure a complete"
+  echo "XFCE remote desktop environment."
+  echo ""
+  echo "The following software will be installed:"
+  echo " - XFCE Desktop Environment"
+  echo " - XRDP for remote access"
+  echo " - Firefox and Chromium browsers"
+  echo " - LibreOffice Suite"
+  echo " - Visual Studio Code"
+  print_separator
+  read -p "Do you want to continue? (y/n) " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    error_exit "Installation cancelled by user."
+  fi
+}
 
-# === Install XFCE Desktop ===
-echo "[*] Installing XFCE Desktop Environment..."
-sudo apt install -y xfce4 xfce4-goodies
+# Function to clean up previously installed packages
+cleanup() {
+  echo "[*] Cleaning up any conflicting packages..."
+  sudo apt purge -y \
+    ubuntu-mate-core ubuntu-mate-desktop ubuntu-desktop \
+    xfce4 xfce4-goodies lxde lxqt cinnamon-desktop-environment \
+    kde-plasma-desktop xrdp firefox chromium-browser libreoffice code &>/dev/null || echo "No packages to remove."
+  sudo apt autoremove -y &>/dev/null
+  sudo apt autoclean &>/dev/null
+}
 
-# === Install XRDP ===
-echo "[*] Installing XRDP..."
-sudo apt install -y xrdp
-sudo systemctl enable xrdp
-sudo systemctl start xrdp
+# Function to install all necessary packages
+install_packages() {
+  echo "[*] Updating system and installing packages..."
+  sudo apt-get update && sudo apt-get upgrade -y || error_exit "System update failed."
 
-# === Configure XRDP to use XFCE ===
-echo "[*] Setting XFCE as the default desktop session..."
-echo "startxfce4" > ~/.xsession
-sudo sed -i 's/console/anybody/' /etc/X11/Xwrapper.config
-sudo systemctl restart xrdp
+  local packages_to_install=(
+    xfce4
+    xfce4-goodies
+    xrdp
+    firefox
+    chromium-browser
+    libreoffice
+  )
 
-# === Create New User for RDP ===
-echo "[*] Creating user '$USERNAME'..."
-sudo adduser --gecos "" --disabled-password "$USERNAME"
-echo "$USERNAME:$PASSWORD" | sudo chpasswd
-sudo usermod -aG sudo "$USERNAME"
+  sudo apt-get install -y "${packages_to_install[@]}" || error_exit "Package installation failed."
 
-# === Install Browsers ===
-echo "[*] Installing Firefox and Chromium browsers..."
-sudo apt install -y firefox chromium-browser
+  # Install VS Code separately as it requires adding a new repository
+  install_vscode
+}
 
-# === Install LibreOffice ===
-echo "[*] Installing LibreOffice office suite..."
-sudo apt install -y libreoffice
+# Function to install Visual Studio Code
+install_vscode() {
+  echo "[*] Installing Visual Studio Code..."
+  if ! command -v code &> /dev/null; then
+    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >packages.microsoft.gpg
+    sudo install -o root -g root -m 644 packages.microsoft.gpg /usr/share/keyrings/
+    sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+    sudo apt-get update
+    sudo apt-get install -y code || error_exit "VS Code installation failed."
+    rm -f packages.microsoft.gpg
+  else
+    echo "Visual Studio Code is already installed."
+  fi
+}
 
-# === Install Visual Studio Code ===
-echo "[*] Installing Visual Studio Code..."
-wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-sudo install -o root -g root -m 644 packages.microsoft.gpg /usr/share/keyrings/
-sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
-sudo apt update
-sudo apt install -y code
-rm -f packages.microsoft.gpg
+# Function to configure XRDP and XFCE
+configure_xrdp() {
+  echo "[*] Configuring XRDP to use the XFCE session..."
+  # Set XFCE as the default session for the current user
+  if [ ! -f ~/.xsession ] || ! grep -q "startxfce4" ~/.xsession; then
+    echo "startxfce4" >~/.xsession
+  fi
 
-# === Configure Firewall ===
-echo "[*] Setting up UFW firewall rules..."
-sudo ufw allow 3389/tcp
-sudo ufw allow ssh
-sudo ufw --force enable
+  # Allow anyone to start a session
+  if ! sudo grep -q "allowed_users=anybody" /etc/X11/Xwrapper.config; then
+    sudo sed -i 's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
+  fi
 
-# === Final Output ===
-IP=$(curl -s ifconfig.me)
-echo ""
-echo "====================================================="
-echo "✅ XRDP with XFCE, LibreOffice, and VS Code is ready on Ubuntu 22.04!"
-echo "🌐 Web browsers installed:"
-echo "   - Firefox"
-echo "   - Chromium"
-echo "📝 Office suite installed:"
-echo "   - LibreOffice"
-echo "💻 Editor installed:"
-echo "   - Visual Studio Code"
-echo "🔐 Login with:"
-echo "   - Username: $USERNAME"
-echo "   - Password: $PASSWORD"
-echo "💻 RDP Client: Connect to $IP:3389"
-echo "🔒 REMINDER: Change the password after logging in!"
-echo "====================================================="
+  # Enable and restart XRDP
+  sudo systemctl enable xrdp && sudo systemctl restart xrdp || error_exit "XRDP configuration failed."
+}
+
+# Function to create a new user
+create_user() {
+  echo "[*] Creating user '$USERNAME' for RDP access..."
+  if id "$USERNAME" &>/dev/null; then
+    echo "User '$USERNAME' already exists. Skipping user creation."
+  else
+    sudo adduser --gecos "" --disabled-password "$USERNAME" || error_exit "User creation failed."
+    echo "Please set a password for the new user '$USERNAME'."
+    sudo passwd "$USERNAME" || error_exit "Password setup failed."
+    sudo usermod -aG sudo "$USERNAME"
+  fi
+}
+
+# Function to set up the firewall
+configure_firewall() {
+  echo "[*] Setting up UFW firewall rules..."
+  if ! sudo ufw status | grep -q "3389/tcp"; then
+    sudo ufw allow 3389/tcp # RDP
+  fi
+  if ! sudo ufw status | grep -q "22/tcp"; then
+    sudo ufw allow 22/tcp   # SSH
+  fi
+  sudo ufw --force enable
+}
+
+# Main execution function
+main() {
+  show_welcome_message
+  cleanup
+  install_packages
+  configure_xrdp
+  create_user
+  configure_firewall
+
+  # Final Output
+  IP=$(curl -s ifconfig.me)
+  print_separator
+  echo "✅ Setup Complete!"
+  echo "Your remote desktop is ready."
+  print_separator
+  echo "🌐 Web browsers: Firefox, Chromium"
+  echo "📝 Office suite: LibreOffice"
+  echo "💻 Editor: Visual Studio Code"
+  echo "🔐 Login with username: $USERNAME"
+  echo "💻 Connect using your RDP client to: $IP:3389"
+  print_separator
+}
+
+# Run the main function
+main
