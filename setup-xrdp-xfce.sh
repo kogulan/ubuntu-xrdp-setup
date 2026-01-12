@@ -38,6 +38,22 @@ print_separator() {
 
 # --- Main Logic ---
 
+# Function to check the OS version and exit if not supported
+check_os_version() {
+  echo "[*] Checking Ubuntu version..."
+  local os_version
+  os_version=$(lsb_release -rs)
+
+  case "$os_version" in
+    "18.04"|"20.04"|"22.04"|"24.04")
+      echo "✅ Supported Ubuntu LTS version found: $os_version"
+      ;;
+    *)
+      error_exit "This script is designed for Ubuntu LTS versions 18.04, 20.04, 22.04, or 24.04. Your version: $os_version"
+      ;;
+  esac
+}
+
 # Function to display a welcome message and installation summary
 show_welcome_message() {
   echo "👋 Welcome to the Ubuntu Remote Desktop Setup Script!"
@@ -66,8 +82,20 @@ cleanup() {
   local packages_to_remove=(
     ubuntu-mate-core ubuntu-mate-desktop ubuntu-desktop
     xfce4 xfce4-goodies lxde lxqt cinnamon-desktop-environment
-    kde-plasma-desktop xrdp firefox chromium-browser libreoffice-core code
+    kde-plasma-desktop xrdp firefox libreoffice-core code
   )
+
+  # Add chromium-browser for Ubuntu 18.04, otherwise handle snap
+  local os_version
+  os_version=$(lsb_release -rs)
+  if [[ "$os_version" == "18.04" ]]; then
+    packages_to_remove+=("chromium-browser")
+  else
+    if snap list | grep -q "chromium"; then
+      echo "Removing Chromium snap..."
+      sudo snap remove chromium
+    fi
+  fi
 
   # Check which packages are installed and purge them
   local packages_to_purge=()
@@ -98,12 +126,23 @@ install_packages() {
     xfce4-goodies
     xrdp
     firefox
-    chromium-browser
     libreoffice
   )
 
+  # Add chromium-browser for Ubuntu 18.04
+  local os_version
+  os_version=$(lsb_release -rs)
+  if [[ "$os_version" == "18.04" ]]; then
+    packages_to_install+=("chromium-browser")
+  fi
+
   echo "Installing: ${packages_to_install[*]}"
   sudo apt-get install -y "${packages_to_install[@]}" || error_exit "Package installation failed."
+
+  # On newer systems, install Chromium via snap
+  if [[ "$os_version" != "18.04" ]]; then
+    install_chromium_snap
+  fi
 
   # VS Code is installed separately as it requires adding a repository
   install_vscode
@@ -126,6 +165,16 @@ install_vscode() {
     rm -f packages.microsoft.gpg
   else
     echo "Visual Studio Code is already installed."
+  fi
+}
+
+# Function to install Chromium browser using snap
+install_chromium_snap() {
+  echo "[*] Installing Chromium browser via snap..."
+  if ! snap list | grep -q "chromium"; then
+    sudo snap install chromium || error_exit "Chromium snap installation failed."
+  else
+    echo "Chromium is already installed via snap."
   fi
 }
 
@@ -200,6 +249,8 @@ configure_firewall() {
 
 # --- Main Execution ---
 main() {
+  check_os_version
+
   # Prompt for the username, defaulting to the value of DEFAULT_USERNAME
   read -p "Enter the username for the new RDP user [${DEFAULT_USERNAME}]: " username
   local final_username=${username:-$DEFAULT_USERNAME}
