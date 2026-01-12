@@ -1,144 +1,86 @@
-# 🖥️ Ubuntu Remote Desktop Setup Script (XFCE + XRDP + VS Code + LibreOffice)
+# 🖥️ Ubuntu Remote Desktop Setup Script (XFCE + XRDP)
 
-This Bash script automates the setup of a **lightweight Ubuntu desktop environment** with **XRDP remote access**, browsers, productivity tools, and firewall rules on **Ubuntu 22.04**.
+This script automates the setup of a lightweight but powerful remote desktop environment on Ubuntu LTS servers. It installs the XFCE desktop, enables remote access via XRDP, and bundles essential software to create a ready-to-use workstation.
 
-## 🚀 Features
+## ✨ Key Features
 
-- Installs the XFCE desktop environment (lightweight and fast)
-- Sets up XRDP for Remote Desktop access
-- Installs:
-  - Firefox and Chromium web browsers
-  - LibreOffice suite
-  - Visual Studio Code
-- Creates a new sudo user for RDP access
-- Configures firewall (UFW) for SSH and RDP
-- Cleans up unnecessary desktop packages
+- **Lightweight Desktop:** Installs the XFCE Desktop Environment, which is fast and resource-friendly.
+- **Remote Access:** Configures XRDP to allow connections from any standard RDP client (like Windows Remote Desktop).
+- **Essential Software:** Comes pre-loaded with:
+  - Web Browsers (Firefox & Chromium)
+  - Office Suite (LibreOffice)
+  - Code Editor (Visual Studio Code)
+- **User Management:** Creates a new user account for RDP access and optionally grants administrative privileges.
+- **Firewall Configuration:** Sets up basic UFW firewall rules to allow SSH and RDP traffic.
 
----
+## ✅ Supported Ubuntu Versions
+
+This script is tested and maintained for the following Ubuntu Long-Term Support (LTS) versions:
+
+- **Ubuntu 24.04 LTS** (Noble Numbat)
+- **Ubuntu 22.04 LTS** (Jammy Jellyfish)
+- **Ubuntu 20.04 LTS** (Focal Fossa)
+- **Ubuntu 18.04 LTS** (Bionic Beaver)
+
+The script will exit with a warning if run on an unsupported version.
 
 ## 📋 Prerequisites
 
-- Ubuntu 22.04 (fresh installation recommended)
-- Internet connection
-- Run as a user with `sudo` privileges
+- A server running one of the supported Ubuntu LTS versions.
+- An active internet connection.
+- A user account with `sudo` privileges.
 
----
+## 🚀 Installation & Usage
 
-## 🛠️ How to Use
+1.  **Download the Script**
+    You can download the script directly to your server using `wget`:
+    ```bash
+    wget https://raw.githubusercontent.com/kogulan/ubuntu-xrdp-setup/main/setup-xrdp-xfce.sh
+    ```
 
-### 1. Clone or Download
+2.  **Make it Executable**
+    ```bash
+    chmod +x setup-xrdp-xfce.sh
+    ```
 
+3.  **Run the Script**
+    Execute the script with `sudo`. It will guide you through the setup process.
+    ```bash
+    sudo ./setup-xrdp-xfce.sh
+    ```
+    You will be prompted to enter a username and set a password for the new RDP user.
+
+## 💻 Connecting with RDP
+
+Once the script is finished, it will display the IP address of your server. Use this information to connect with your favorite RDP client (e.g., Remote Desktop Connection on Windows).
+
+- **Computer/Host:** Your server's IP address (e.g., `203.0.113.15`)
+- **Port:** `3389` (default RDP port)
+- **Username:** The username you created during setup.
+- **Password:** The password you set for the RDP user.
+
+## 🔒 Security Recommendations
+
+For servers exposed to the internet, it is critical to implement additional security measures:
+
+- **Use a Strong Password:** Always use a complex and unique password for your RDP user.
+- **SSH Keys:** Prioritize SSH key-based authentication for your server instead of passwords.
+- **Firewall Rules:** Restrict RDP access (`port 3389`) to trusted IP addresses if possible.
+- **Use Fail2ban:** Install and configure `fail2ban` to protect against brute-force login attempts.
+
+## 🧹 Uninstallation
+
+To remove the components installed by this script, use the appropriate commands for your Ubuntu version.
+
+**For Ubuntu 20.04, 22.04, and 24.04:**
 ```bash
-git clone https://github.com/kogulan/ubuntu-xrdp-setup.git
-```
-```bash
-cd ubuntu-xrdp-setup
-```
-
-Or simply download and run the script:
-
-```bash
-wget https://yourdomain.com/setup-xrdp-xfce.sh
-```
-```bash
-chmod +x setup-xrdp-xfce.sh
-```
-
-### 2. Run the Script
-
-Run the script with `sudo` privileges:
-
-```bash
-sudo ./setup-xrdp-xfce.sh
-```
-
-The script will prompt you to:
-- Enter a **username** for the new RDP user (or press Enter to use the default `kogulan`).
-- Confirm that you want to proceed with the installation.
-- Set a **password** for the new user.
-
-The script will then automate the entire setup process, including cleaning old packages, installing the desktop and applications, and configuring the firewall.
-
----
-
-## 🖥️ Remote Desktop Login
-
-Use any RDP client (like **Remote Desktop Connection** on Windows or **Remmina** on Linux/macOS):
-
-- **Host/IP:** (shown at the end of the script)  
-- **Port:** `3389`
-- **Username:** `kogulan` (or your custom value)
-- **Password:** `StrongPass123` (or your custom value)
-
-Example:
-
-```text
-Username: kogulan
-Password: StrongPass123
-RDP Address: 203.0.113.15:3389
-```
-
----
-
-## 🔒 Security Warning
-
-**Do not use weak passwords** for remote access. It’s strongly recommended to:
-
-- Use SSH key-based login instead of passwords (for SSH)
-- Change the password after logging in
-- Use fail2ban or other brute-force protection if exposed to the internet
-
----
-
-## 🧹 Uninstallation (Optional)
-
-To remove all installed components:
-
-```bash
-sudo apt purge -y xfce4 xfce4-goodies xrdp firefox chromium libreoffice code
+sudo apt purge -y xfce4 xfce4-goodies xrdp firefox libreoffice code
+sudo snap remove chromium
 sudo apt autoremove -y
 ```
 
----
-
-## 📄 Example Output
-
+**For Ubuntu 18.04:**
+```bash
+sudo apt purge -y xfce4 xfce4-goodies xrdp firefox chromium-browser libreoffice code
+sudo apt autoremove -y
 ```
-[*] Cleaning up previously installed desktop environments...
-[*] Updating system...
-[*] Installing XFCE Desktop Environment...
-[*] Installing XRDP...
-[*] Creating user 'kogulan'...
-[*] Installing Firefox and Chromium browsers...
-[*] Installing LibreOffice office suite...
-[*] Installing Visual Studio Code...
-[*] Setting up UFW firewall rules...
-
-✅ XRDP with XFCE, LibreOffice, and VS Code is ready on Ubuntu 22.04!
-🌐 Browsers: Firefox, Chromium
-📝 Office: LibreOffice
-💻 Editor: Visual Studio Code
-🔐 RDP Login: kogulan / StrongPass123
-🌍 Connect: 203.0.113.15:3389
-```
-
----
-
-## 📦 Tested On
-
-- ✅ Ubuntu 22.04 LTS (64-bit)
-
----
-
-## 📬 Issues & Contributions
-
-Feel free to open an issue or submit a pull request to improve the script or add support for additional configurations!
-
----
-
-## 🧑‍💻 Author
-
-**Kogulan**  
-Feel free to customize and use in your own deployment workflows.
-
----
