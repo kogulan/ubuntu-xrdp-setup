@@ -119,7 +119,9 @@ cleanup() {
 # Function to install all necessary packages for the remote desktop
 install_packages() {
   echo "[*] Updating system and installing required packages..."
-  sudo apt-get update && sudo apt-get upgrade -y || error_exit "System update failed."
+  if ! (sudo apt-get update && sudo apt-get upgrade -y); then
+    error_exit "System update failed."
+  fi
 
   local packages_to_install=(
     xfce4
@@ -194,7 +196,9 @@ configure_xrdp() {
 
   # Enable and restart the XRDP service
   echo "Enabling and restarting XRDP service..."
-  sudo systemctl enable xrdp && sudo systemctl restart xrdp || error_exit "XRDP configuration failed."
+  if ! (sudo systemctl enable xrdp && sudo systemctl restart xrdp); then
+    error_exit "XRDP configuration failed."
+  fi
 }
 
 # Function to create a new user for RDP access
@@ -226,25 +230,29 @@ create_user() {
 configure_firewall() {
   echo "[*] Setting up UFW firewall rules..."
 
-  # Allow RDP traffic
-  if ! sudo ufw status | grep -q "${RDP_PORT}/tcp"; then
-    echo "Allowing RDP traffic on port ${RDP_PORT}..."
-    sudo ufw allow "${RDP_PORT}/tcp"
+  # Check if ufw is installed and install it if not
+  if ! command -v ufw &>/dev/null; then
+    echo "ufw is not installed. Installing..."
+    if ! (sudo apt-get update && sudo apt-get install -y ufw); then
+      error_exit "ufw installation failed."
+    fi
   fi
 
-  # Allow SSH traffic
-  if ! sudo ufw status | grep -q "${SSH_PORT}/tcp"; then
-    echo "Allowing SSH traffic on port ${SSH_PORT}..."
-    sudo ufw allow "${SSH_PORT}/tcp"
-  fi
+  # Allow RDP and SSH traffic (ufw is idempotent, so no need to check)
+  echo "Allowing RDP traffic on port ${RDP_PORT}..."
+  sudo ufw allow "${RDP_PORT}/tcp"
+
+  echo "Allowing SSH traffic on port ${SSH_PORT}..."
+  sudo ufw allow "${SSH_PORT}/tcp"
 
   # Enable the firewall if it's not already active
   if ! sudo ufw status | grep -q "Status: active"; then
     echo "Enabling the UFW firewall..."
     sudo ufw --force enable
-  else
-    echo "UFW is already active."
   fi
+
+  echo "UFW firewall is active. Current status:"
+  sudo ufw status
 }
 
 # --- Main Execution ---
@@ -252,7 +260,7 @@ main() {
   check_os_version
 
   # Prompt for the username, defaulting to the value of DEFAULT_USERNAME
-  read -p "Enter the username for the new RDP user [${DEFAULT_USERNAME}]: " username
+  read -r -p "Enter the username for the new RDP user [${DEFAULT_USERNAME}]: " username
   local final_username=${username:-$DEFAULT_USERNAME}
 
   show_welcome_message
