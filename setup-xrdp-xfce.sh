@@ -129,6 +129,7 @@ install_packages() {
     xrdp
     firefox
     libreoffice
+    ufw
   )
 
   # Add chromium-browser for Ubuntu 18.04
@@ -229,14 +230,6 @@ create_user() {
 # Function to set up the firewall to allow RDP and SSH traffic
 configure_firewall() {
   echo "[*] Setting up UFW firewall rules..."
-
-  # Check if ufw is installed and install it if not
-  if ! command -v ufw &>/dev/null; then
-    echo "ufw is not installed. Installing..."
-    if ! (sudo apt-get update && sudo apt-get install -y ufw); then
-      error_exit "ufw installation failed."
-    fi
-  fi
 
   # Allow RDP and SSH traffic (ufw is idempotent, so no need to check)
   echo "Allowing RDP traffic on port ${RDP_PORT}..."
