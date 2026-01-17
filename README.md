@@ -35,7 +35,7 @@ The script will exit with a warning if run on an unsupported version.
 1.  **Download the Script**
     You can download the script directly to your server using `wget`:
     ```bash
-    wget https://raw.githubusercontent.com/kogulan/ubuntu-xrdp-setup/main/setup-xrdp-xfce.sh
+    wget https://raw.githubusercontent.com/kogulan/ubuntu-xrdp-setup/master/setup-xrdp-xfce.sh
     ```
 
 2.  **Make it Executable**
