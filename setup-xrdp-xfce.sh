@@ -233,29 +233,26 @@ configure_firewall() {
   # Check if ufw is installed and install it if not
   if ! command -v ufw &>/dev/null; then
     echo "ufw is not installed. Installing..."
-    sudo apt-get update
-    sudo apt-get install -y ufw || error_exit "ufw installation failed."
+    if ! (sudo apt-get update && sudo apt-get install -y ufw); then
+      error_exit "ufw installation failed."
+    fi
   fi
 
-  # Allow RDP traffic
-  if ! sudo ufw status | grep -q "${RDP_PORT}/tcp"; then
-    echo "Allowing RDP traffic on port ${RDP_PORT}..."
-    sudo ufw allow "${RDP_PORT}/tcp"
-  fi
+  # Allow RDP and SSH traffic (ufw is idempotent, so no need to check)
+  echo "Allowing RDP traffic on port ${RDP_PORT}..."
+  sudo ufw allow "${RDP_PORT}/tcp"
 
-  # Allow SSH traffic
-  if ! sudo ufw status | grep -q "${SSH_PORT}/tcp"; then
-    echo "Allowing SSH traffic on port ${SSH_PORT}..."
-    sudo ufw allow "${SSH_PORT}/tcp"
-  fi
+  echo "Allowing SSH traffic on port ${SSH_PORT}..."
+  sudo ufw allow "${SSH_PORT}/tcp"
 
   # Enable the firewall if it's not already active
   if ! sudo ufw status | grep -q "Status: active"; then
     echo "Enabling the UFW firewall..."
     sudo ufw --force enable
-  else
-    echo "UFW is already active."
   fi
+
+  echo "UFW firewall is active. Current status:"
+  sudo ufw status
 }
 
 # --- Main Execution ---
