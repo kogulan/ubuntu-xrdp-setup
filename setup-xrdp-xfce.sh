@@ -1,16 +1,15 @@
 #!/bin/bash
 
 # =================================================================
-#         XRDP with XFCE, LibreOffice, and VS Code Setup
+#                 XRDP with XFCE Setup Script
 # =================================================================
 #
-# This script automates the setup of a complete remote desktop
-# environment on Ubuntu 22.04.
+# This script automates the setup of a basic remote desktop
+# environment on Ubuntu 24.04.
 #
 # Features:
 # - Installs XFCE, a lightweight desktop environment
 # - Configures XRDP for remote access
-# - Installs Firefox, Chromium, LibreOffice, and VS Code
 # - Creates a new user with optional sudo privileges
 # - Sets up UFW firewall rules for SSH and RDP
 #
