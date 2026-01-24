@@ -118,11 +118,6 @@ install_packages() {
 configure_xrdp() {
   echo "[*] Configuring XRDP to use the XFCE session..."
 
-  # Set XFCE as the default session for the current user
-  if [ ! -f ~/.xsession ] || ! grep -q "startxfce4" ~/.xsession; then
-    echo "startxfce4" >~/.xsession
-  fi
-
   # Allow any user to start a session (required for XRDP)
   if ! sudo grep -q "allowed_users=anybody" /etc/X11/Xwrapper.config; then
     sudo sed -i 's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
@@ -140,9 +135,7 @@ create_user() {
   local username=$1
   echo "[*] Creating user '$username' for RDP access..."
 
-  if id "$username" &>/dev/null; then
-    echo "User '$username' already exists. Skipping user creation."
-  else
+  if ! id "$username" &>/dev/null; then
     # Create the user with an empty password (will be prompted to set one)
     sudo adduser --gecos "" --disabled-password "$username" || error_exit "User creation failed."
     echo "Please set a password for the new user '$username'."
@@ -157,6 +150,26 @@ create_user() {
     else
       echo "User '$username' will not have sudo privileges."
     fi
+  else
+    echo "User '$username' already exists. Skipping user creation."
+  fi
+
+  # Create .xsession file for the user
+  echo "[*] Configuring XFCE session for '$username'..."
+  local user_home
+  user_home=$(getent passwd "$username" | cut -d: -f6)
+
+  if [ -z "$user_home" ] || [ ! -d "$user_home" ]; then
+      error_exit "Could not find home directory for '$username'."
+  fi
+
+  # Create .xsession file if it doesn't exist
+  if [ ! -f "$user_home/.xsession" ]; then
+      echo "startxfce4" | sudo tee "$user_home/.xsession" > /dev/null
+      sudo chown "$username:$username" "$user_home/.xsession"
+      echo "✅ .xsession file created for '$username'."
+  else
+      echo "✅ .xsession file already exists for '$username'."
   fi
 }
 
