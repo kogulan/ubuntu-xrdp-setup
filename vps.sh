@@ -34,7 +34,11 @@ echo "startxfce4" | sudo tee "$HOME_DIR/.xsession" > /dev/null
 sudo chown "$USERNAME:$USERNAME" "$HOME_DIR/.xsession"
 
 # --- Applications ---
-sudo apt install -y firefox libreoffice chromium-browser
+sudo apt install -y \
+  firefox \
+  libreoffice \
+  chromium-browser \
+  vlc
 
 # VS Code (ARM64)
 VSCODE_DEB="/tmp/vscode-arm64.deb"
